@@ -1,0 +1,35 @@
+package io.github.ingkoon.artinus.channel.domain;
+
+import io.github.ingkoon.artinus.common.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@Table(name = "CHANNEL")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Channel extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "CHANNEL_ID")
+    private Long id;
+
+    @Column(name = "NAME", nullable = false)
+    private String name;
+
+    @Column(name = "CAN_SUBSCRIBE", nullable = false)
+    private boolean subscribable;
+
+    @Column(name = "CAN_CANCEL", nullable = false)
+    private boolean cancellable;
+
+    public Channel(Long id, String name, boolean subscribable, boolean cancellable) {
+        this.id = id;
+        this.name = name;
+        this.subscribable = subscribable;
+        this.cancellable = cancellable;
+    }
+}
