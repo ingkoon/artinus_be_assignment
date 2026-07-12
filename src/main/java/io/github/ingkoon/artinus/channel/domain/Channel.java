@@ -1,6 +1,8 @@
 package io.github.ingkoon.artinus.channel.domain;
 
 import io.github.ingkoon.artinus.common.entity.BaseEntity;
+import io.github.ingkoon.artinus.common.exception.BusinessException;
+import io.github.ingkoon.artinus.common.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,5 +33,17 @@ public class Channel extends BaseEntity {
         this.name = name;
         this.subscribable = subscribable;
         this.cancellable = cancellable;
+    }
+
+    public void validateSubscribable() {
+        if (!this.subscribable) {
+            throw new BusinessException(ErrorCode.CHANNEL_NOT_SUBSCRIBABLE);
+        }
+    }
+
+    public void validateCancellable() {
+        if (!this.cancellable) {
+            throw new BusinessException(ErrorCode.CHANNEL_NOT_CANCELLABLE);
+        }
     }
 }

@@ -1,7 +1,9 @@
 package io.github.ingkoon.artinus.user.domain;
 
 import io.github.ingkoon.artinus.common.entity.BaseEntity;
+import io.github.ingkoon.artinus.common.exception.ErrorCode;
 import io.github.ingkoon.artinus.user.enums.UserStatus;
+import io.github.ingkoon.artinus.user.exception.InvalidStatusTransitionException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +32,53 @@ public class User extends BaseEntity {
         this.status = status;
     }
 
-    public void changeStatus(UserStatus newStatus) {
-        this.status = newStatus;
+
+    /**
+     * 최초 가입 회원 생성.
+     * 가입 가능한 초기 상태(BASIC/PREMIUM)인지 검증한 뒤 생성한다.
+     */
+    public static User create(String phone, UserStatus initialStatus) {
+        UserStatus.validateInitialStatus(initialStatus);
+        return new User(phone, initialStatus);
+    }
+
+    /**
+     * 구독 전이를 수행하고 전이 직전 상태(from)를 반환한다.
+     */
+    public UserStatus subscribeTo(UserStatus target) {
+        validateSubscribableTo(target);
+        UserStatus from = this.status;
+        this.status = target;
+        return from;
+    }
+
+    /**
+     * 해지 전이를 수행하고 전이 직전 상태(from)를 반환한다.
+     */
+    public UserStatus cancelTo(UserStatus target) {
+        validateCancellableTo(target);
+        UserStatus from = this.status;
+        this.status = target;
+        return from;
+    }
+
+    /**
+     * 구독 전이 가능 여부만 검증한다. (상태 변경 없음 — 외부 API 호출 전 사전 검증용)
+     */
+    public void validateSubscribableTo(UserStatus target) {
+        if (!this.status.canSubscribeTo(target)) {
+            throw new InvalidStatusTransitionException(
+                    ErrorCode.INVALID_SUBSCRIBE_TRANSITION, this.status, target);
+        }
+    }
+
+    /**
+     * 해지 전이 가능 여부만 검증한다. (상태 변경 없음 — 외부 API 호출 전 사전 검증용)
+     */
+    public void validateCancellableTo(UserStatus target) {
+        if (!this.status.canCancelTo(target)) {
+            throw new InvalidStatusTransitionException(
+                    ErrorCode.INVALID_CANCEL_TRANSITION, this.status, target);
+        }
     }
 }
