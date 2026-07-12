@@ -16,7 +16,7 @@ public class Channel extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CHANNEL_ID")
+    @Column(name = "ID")
     private Long id;
 
     @Column(name = "NAME", nullable = false)
