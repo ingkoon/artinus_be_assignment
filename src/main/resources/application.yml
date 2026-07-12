@@ -1,3 +1,56 @@
 spring:
   application:
     name: artinus_be_assignment
+
+  datasource:
+    url: jdbc:h2:mem:artinus;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create          # 앱 시작 시 스키마 생성 (테스트/과제용)
+    defer-datasource-initialization: true   # 스키마 생성 후 data.sql 실행되도록
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true              # 실행 SQL 로그 (개발 중 확인용)
+
+  sql:
+    init:
+      mode: always              # data.sql 항상 실행
+
+  claude:
+    api-key: ${CLAUDE_API_KEY:}   # 환경변수로 주입, 없으면 빈 값 (조회는 나중에 구현)
+    model: claude-sonnet-4-6      # 실제 값은 docs.anthropic.com에서 확인
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      csrng:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        record-exceptions:
+          - io.github.ingkoon.artinus.common.client.csrng.exception.ExternalApiUnavailableException
+        ignore-exceptions:
+          - io.github.ingkoon.artinus.common.client.csrng.exception.ExternalApiFailedException
+  retry:
+    instances:
+      csrng:
+        max-attempts: 3
+        wait-duration: 200ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        retry-exceptions:
+          - io.github.ingkoon.artinus.common.client.csrng.exception.ExternalApiUnavailableException
+        ignore-exceptions:
+          - io.github.ingkoon.artinus.common.client.csrng.exception.ExternalApiFailedException
