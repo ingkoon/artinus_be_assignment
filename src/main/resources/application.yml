@@ -25,10 +25,23 @@ spring:
   sql:
     init:
       mode: always              # data.sql 항상 실행
+      encoding: UTF-8           # data.sql의 한글(채널명)이 플랫폼 기본 인코딩(CP949)으로 깨지지 않도록
 
-  claude:
-    api-key: ${CLAUDE_API_KEY:}   # 환경변수로 주입, 없으면 빈 값 (조회는 나중에 구현)
-    model: claude-sonnet-4-6      # 실제 값은 docs.anthropic.com에서 확인
+csrng:
+  base-url: https://csrng.net     # 외부 난수 API host (장애 시뮬레이션 시 override)
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html        # UI 진입점 (/swagger-ui/index.html 로 리다이렉트)
+    operations-sorter: method
+    tags-sorter: alpha
+  default-produces-media-type: application/json
+
+claude:                           # top-level (이전엔 spring 하위에 잘못 중첩되어 있었음)
+  api-key: ${CLAUDE_API_KEY:}     # 환경변수로 주입 — 저장소에 커밋 금지
+  model: claude-sonnet-5          # 최신 Sonnet (docs.anthropic.com 기준)
+  base-url: https://api.anthropic.com
+  max-tokens: 1024                # 요약 한 문단이면 충분
 
 resilience4j:
   circuitbreaker:

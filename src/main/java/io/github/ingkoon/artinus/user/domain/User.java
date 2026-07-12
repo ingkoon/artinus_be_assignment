@@ -27,6 +27,11 @@ public class User extends BaseEntity {
     @Column(name = "STATUS", nullable = false)
     private UserStatus status;
 
+    /** 낙관적 락: 같은 회원 동시 전이 시 나중 커밋을 충돌로 감지(→ 진 트랜잭션 롤백). */
+    @Version
+    @Column(name = "VERSION")
+    private Long version;
+
     public User(String phone, UserStatus status) {
         this.phone = phone;
         this.status = status;

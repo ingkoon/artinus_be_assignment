@@ -1,4 +1,4 @@
-package io.github.ingkoon.artinus.common.client.csrng;
+package io.github.ingkoon.artinus.common.client.claude;
 
 import io.github.ingkoon.artinus.common.client.RestClientFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,18 +9,21 @@ import org.springframework.web.client.RestClient;
 import java.time.Duration;
 
 @Configuration
-public class CsrngClientConfig {
+public class ClaudeClientConfig {
 
-    /** 외부 API host. 하드코딩 대신 프로퍼티로 주입(기본값 유지) — 설정 일관성 + 장애 시뮬레이션/테스트 용이. */
-    @Value("${csrng.base-url:https://csrng.net}")
+    @Value("${claude.base-url:https://api.anthropic.com}")
     private String baseUrl;
 
+    /**
+     * LLM은 느리므로 read timeout을 넉넉히(30s) 준다.
+     * csrng의 2s를 쓰면 정상 응답도 타임아웃난다.
+     */
     @Bean
-    public RestClient csrngRestClient(RestClientFactory factory) {
+    public RestClient claudeRestClient(RestClientFactory factory) {
         return factory.create(
                 baseUrl,
-                Duration.ofSeconds(2),
-                Duration.ofSeconds(2)
+                Duration.ofSeconds(3),
+                Duration.ofSeconds(30)
         );
     }
 }

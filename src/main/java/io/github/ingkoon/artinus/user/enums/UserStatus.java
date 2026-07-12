@@ -41,4 +41,13 @@ public enum UserStatus {
             throw new BusinessException(ErrorCode.INVALID_INITIAL_STATUS);
         }
     }
+
+    /** 이력 요약 프롬프트 등 표현용 한글 라벨. */
+    public String koreanLabel() {
+        return switch (this) {
+            case NONE -> "구독 안함";
+            case BASIC -> "일반 구독";
+            case PREMIUM -> "프리미엄 구독";
+        };
+    }
 }

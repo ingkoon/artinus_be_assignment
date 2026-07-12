@@ -5,19 +5,23 @@ import io.github.ingkoon.artinus.common.client.csrng.exception.ExternalApiUnavai
 import io.github.ingkoon.artinus.common.client.csrng.response.CsrngResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class CsrngClient {
 
     private final RestClient csrngRestClient;
+
+    // RestClient 빈이 여러 개(csrng/claude)이므로 이름 의존 없이 @Qualifier로 명시 주입
+    public CsrngClient(@Qualifier("csrngRestClient") RestClient csrngRestClient) {
+        this.csrngRestClient = csrngRestClient;
+    }
 
     /**
      * csrng를 호출해 트랜잭션 진행 가능 여부를 검증한다.
@@ -25,8 +29,8 @@ public class CsrngClient {
      * - random == 0 : ExternalApiFailedException (비즈니스 롤백, 재시도 X)
      * - 통신 장애    : ExternalApiUnavailableException (재시도/서킷 대상)
      */
-    @CircuitBreaker(name = "csrng", fallbackMethod = "fallback")
-    @Retry(name = "csrng")
+    @CircuitBreaker(name = "csrng")
+    @Retry(name = "csrng", fallbackMethod = "fallback")
     public void verifyOrThrow() {
         CsrngResponse response = call();
 

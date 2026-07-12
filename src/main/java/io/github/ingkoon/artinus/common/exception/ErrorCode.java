@@ -14,6 +14,7 @@ public enum ErrorCode {
 
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "회원을 찾을 수 없습니다"),
+    CONFLICTING_REQUEST(HttpStatus.CONFLICT, "U002", "동시 요청이 충돌했습니다. 다시 시도해 주세요"),
 
     // Channel
     CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "CH001", "채널을 찾을 수 없습니다"),
